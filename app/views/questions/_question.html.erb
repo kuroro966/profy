@@ -1,0 +1,47 @@
+<div class="question_content top_content">
+  <header class="question_header">
+    <div class="question_image icon_image" style="background-image: url(<%= rails_blob_path( question.user.image) %>);"></div>
+    <div class="question_user_info user_info">
+      <span><%= link_to question.user.name, user_path(question.user) %></span>
+      <time><%= time_ago_in_words question.created_at %></time>
+<!-- time_ago_in_words
+投稿時間を「○○時間前」のようにしたい場合に利用するビューヘルパーメソッドです。
+特にgemを追加する必要なく利用することができます。
+デフォルトだと英語なのでrailsの環境設定を日本語で表示したい場合は、
+config/application.rbの言語設定を日本語（config.i18n.default_locale = :ja）にしておく必要があります。
+また、日本語の文言表示のためにconfig/locales以下にja.ymlを配置しておきましょう。
+     --> 
+      
+    </div>
+  </header>
+  <div class="question_body">
+    
+    <div class="question_box">
+      <span class="q">Q</span>
+      <span class="question_text"><%= question.text %></span>
+    </div>
+    
+    <div class="questioned">
+      <span><%= link_to "回答#{question.answers.count}件", question_path(question) %> </span>
+    </div>
+    
+    <% unless question.answers.exists?(user_id: current_user.id) %>
+      <!--かっこ内の条件のものが存在するかどうかを判定-->
+      <%= form_tag(new_answer_path, method: :get, class: "question_submit") do %>
+        <%= hidden_field_tag(:question_id, question.id) %>
+        <!--{question_id => 3}のようなハッシュを送る事が出来る？-->
+        <%= submit_tag("回答する") %>
+      <% end %>
+    
+     <% else %>
+        <div class="answer_other">
+          <h4>※回答済み※</h4>
+        </div>
+      <% end %>
+    
+<!--hidden_field_tag は、ユーザーが入力する必要の無い自明のデータをパラメーターとして送信したい時に利用します。
+上記では、:question_id というキーに対して個別のquestionのidを値として設定しています。
+このことにより、パラメーターが送られた先では、params[:question_id] とするだけで簡単に対応する質問のidを取得することができます。-->    
+<!--formtagでありDBに何かを保存する訳ではないが、パラメータとしてquestionidを送る-->
+  </div>
+</div>
